@@ -120,29 +120,34 @@ class VIEW3D_PIE_drawtypes(Menu):
         pie.operator("object.tex_draw", text='Textured', icon='TEXTURE')
         pie.operator("object.wire_toggle", text='Wire Toggle', icon='SNAP_FACE')
         
-        #Pie Select
-        km = wm.keyconfigs.addon.keymaps.new(name='Object Non-modal')
-        kmi = km.keymap_items.new('wm.call_menu_pie', 'D', 'PRESS', ctrl=True, alt=False)
+        
+        
+def register():
+    bpy.utils.register_module(__name__)
+
+    km_list = ['3D View']
+    for i in km_list:
+        sm = bpy.context.window_manager
+        km = sm.keyconfigs.default.keymaps[i]
+        kmi = km.keymap_items.new('wm.call_menu_pie', 'Z', 'PRESS', ctrl=True, shift=True)
         kmi.properties.name = "VIEW3D_PIE_drawtypes"
+
+def unregister():
+    bpy.utils.unregister_module(__name__)
+
+    km_list = ['3D View']
+    for i in km_list:
+        sm = bpy.context.window_manager
+        km = sm.keyconfigs.default.keymaps[i]
+        for kmi in (kmi for kmi in km.keymap_items \
+                            if (kmi.idname == "VIEW3D_PIE_drawtypes")):
+            km.keymap_items.remove(kmi)
         
 
 
 
 
-def register():
-    bpy.utils.register_class(WireFrame)
-    bpy.utils.register_class(TexDraw)
-    bpy.utils.register_class(SolidDraw)
-    bpy.utils.register_class(WireToggle)
-    bpy.utils.register_class(VIEW3D_PIE_drawtypes)
 
-
-def unregister():
-    bpy.utils.unregister_class(WireFrame)
-    bpy.utils.unregister_class(TexDraw)
-    bpy.utils.unregister_class(SolidDraw)
-    bpy.utils.unregister_class(WireToggle)
-    bpy.utils.unregister_class(VIEW3D_PIE_drawtypes)
 
 
 if __name__ == "__main__":
