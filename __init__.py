@@ -23,7 +23,7 @@
 
 bl_info = {"name": "Drawtype Operator Pie",
            "author": "CDMJ",
-           "version": (1, 0, 0),
+           "version": (2, 0, 0),
            "blender": (2, 77, 0),
            "location": "",
            "description": "Drawtype per object changing in 3d View",
@@ -40,6 +40,28 @@ from bpy.types import Menu
 
 #operators
 
+class ToggleView(bpy.types.Operator):
+    """Toggle Render Only"""
+    bl_idname = "object.toggle_view" 
+                                     
+     
+    bl_label = "Toggle Render Only"
+    bl_options = { 'REGISTER', 'UNDO' }
+    
+    def execute(self, context):
+
+        scene = context.scene
+
+
+        #new code
+        
+        if bpy.context.space_data.show_only_render == False:
+            bpy.context.space_data.show_only_render = True
+        else:
+            bpy.context.space_data.show_only_render = False  #toggle render only
+        
+        return {'FINISHED'}
+    
 #wire draw
 class WireFrame(bpy.types.Operator):
     """Tooltip"""
@@ -115,7 +137,7 @@ class VIEW3D_PIE_drawtypes(Menu):
         pie = layout.menu_pie()
         #pie.operator("render.render", text='one')
 
-        pie.operator("object.wire_frame", text='Wire', icon='GRID')
+        pie.operator("object.toggle_view", text='Render Only', icon='RENDERLAYERS')
         pie.operator("object.solid_draw", text='Solid', icon='SNAP_VOLUME')
         pie.operator("object.tex_draw", text='Textured', icon='TEXTURE')
         pie.operator("object.wire_toggle", text='Wire Toggle', icon='SNAP_FACE')
