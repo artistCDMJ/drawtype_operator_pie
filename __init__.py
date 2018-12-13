@@ -23,12 +23,13 @@
 
 bl_info = {"name": "Drawtype Operator Pie",
            "author": "CDMJ",
-           "version": (2, 0, 0),
-           "blender": (2, 77, 0),
+           "version": (3, 0, 0),
+           "blender": (2, 80, 0),
            "location": "",
            "description": "Drawtype per object changing in 3d View",
            "warning": "Not usable in TexPaint mode",
            "category": "3D View"}
+
 
 
 
@@ -40,30 +41,30 @@ from bpy.types import Menu
 
 #operators
 
-class ToggleView(bpy.types.Operator):
+class VIEW3D_OT_toggle_view(bpy.types.Operator):
     """Toggle Render Only"""
-    bl_idname = "object.toggle_view" 
-                                     
-     
+    bl_idname = "object.toggle_view"
+#bpy.context.space_data.overlay.show_overlays = False
+
     bl_label = "Toggle Render Only"
     bl_options = { 'REGISTER', 'UNDO' }
-    
+
     def execute(self, context):
 
         scene = context.scene
 
 
         #new code
-        
-        if bpy.context.space_data.show_only_render == False:
-            bpy.context.space_data.show_only_render = True
+
+        if bpy.context.space_data.overlay.show_overlays == False:
+            bpy.context.space_data.overlay.show_overlays = True
         else:
-            bpy.context.space_data.show_only_render = False  #toggle render only
-        
+            bpy.context.space_data.overlay.show_overlays = False  #toggle render only
+
         return {'FINISHED'}
-    
+
 #wire draw
-class WireFrame(bpy.types.Operator):
+class OBJECT_OT_wire_frame(bpy.types.Operator):
     """Tooltip"""
     bl_idname = "object.wire_frame"
     bl_label = "Object to Wire"
@@ -73,25 +74,25 @@ class WireFrame(bpy.types.Operator):
         return context.active_object is not None
 
     def execute(self, context):
-        bpy.context.object.draw_type = 'WIRE'
+        bpy.context.object.display_type = 'WIRE'
         return {'FINISHED'}
-    
-#solid draw    
-class SolidDraw(bpy.types.Operator):
+
+#solid draw
+class OBJECT_OT_solid_draw(bpy.types.Operator):
     """Tooltip"""
     bl_idname = "object.solid_draw"
     bl_label = "Object to Solid"
-
+# bpy.context.object.display_type = 'SOLID'
     @classmethod
     def poll(cls, context):
         return context.active_object is not None
 
     def execute(self, context):
-        bpy.context.object.draw_type = 'SOLID'
+        bpy.context.object.display_type = 'SOLID'
         return {'FINISHED'}
 
 #textured
-class TexDraw(bpy.types.Operator):
+class OBJECT_OT_tex_draw(bpy.types.Operator):
     """Tooltip"""
     bl_idname = "object.tex_draw"
     bl_label = "Object to Texture"
@@ -101,31 +102,31 @@ class TexDraw(bpy.types.Operator):
         return context.active_object is not None
 
     def execute(self, context):
-        bpy.context.object.draw_type = 'TEXTURED'
+        bpy.context.object.display_type = 'TEXTURED'
         return {'FINISHED'}
-    
+
 #wire draw toggle test
-class WireToggle(bpy.types.Operator):
+class OBJECT_OT_wire_toggle(bpy.types.Operator):
     """Tooltip"""
     bl_idname = "object.wire_toggle"
     bl_label = "Toggle Wire"
- 
+
     @classmethod
     def poll(cls, context):
         return context.active_object is not None
- 
+
     def execute(self, context):
-        if bpy.context.object.draw_type == 'SOLID':
-            bpy.context.object.draw_type = 'WIRE'
-        elif bpy.context.object.draw_type == 'WIRE':
-            bpy.context.object.draw_type = 'SOLID'
-        else: 
-            bpy.context.object.draw_type = 'WIRE'
+        if bpy.context.object.display_type == 'SOLID':
+            bpy.context.object.display_type = 'WIRE'
+        elif bpy.context.object.display_type == 'WIRE':
+            bpy.context.object.display_type = 'SOLID'
+        else:
+            bpy.context.object.display_type = 'WIRE'
         return {'FINISHED'}
 
-    
-    
-    
+
+
+
 #------------------------------------#pie
 class VIEW3D_PIE_drawtypes(Menu):
     # label is displayed at the center of the pie menu.
@@ -133,7 +134,7 @@ class VIEW3D_PIE_drawtypes(Menu):
 
     def draw(self, context):
         layout = self.layout
-        
+
         pie = layout.menu_pie()
         #pie.operator("render.render", text='one')
 
@@ -141,11 +142,20 @@ class VIEW3D_PIE_drawtypes(Menu):
         pie.operator("object.solid_draw", text='Solid', icon='SNAP_VOLUME')
         pie.operator("object.tex_draw", text='Textured', icon='TEXTURE')
         pie.operator("object.wire_toggle", text='Wire Toggle', icon='SNAP_FACE')
-        
-        
-        
+
+_CLASSES = (
+    VIEW3D_OT_toggle_view,
+    OBJECT_OT_wire_frame,
+    OBJECT_OT_solid_draw,
+    OBJECT_OT_tex_draw,
+    OBJECT_OT_wire_toggle,
+    VIEW3D_PIE_drawtypes
+)
+
+
 def register():
-    bpy.utils.register_module(__name__)
+    for cls in _CLASSES:
+        bpy.utils.register_class(cls)
 
     km_list = ['3D View']
     for i in km_list:
@@ -155,7 +165,8 @@ def register():
         kmi.properties.name = "VIEW3D_PIE_drawtypes"
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
+    for cls in _CLASSES:
+        bpy.utils.unregister_class(cls)
 
     km_list = ['3D View']
     for i in km_list:
@@ -164,7 +175,7 @@ def unregister():
         for kmi in (kmi for kmi in km.keymap_items \
                             if (kmi.idname == "VIEW3D_PIE_drawtypes")):
             km.keymap_items.remove(kmi)
-        
+
 
 
 
@@ -174,3 +185,4 @@ def unregister():
 
 if __name__ == "__main__":
     register()
+    
