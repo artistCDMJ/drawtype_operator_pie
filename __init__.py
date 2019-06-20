@@ -138,10 +138,10 @@ class VIEW3D_PIE_drawtypes(Menu):
         pie = layout.menu_pie()
         #pie.operator("render.render", text='one')
 
-        pie.operator("object.toggle_view", text='Render Only', icon='RENDERLAYERS')
-        pie.operator("object.solid_draw", text='Solid', icon='SNAP_VOLUME')
+        pie.operator("object.toggle_view", text='Render Only', icon='VIEWZOOM')
+        pie.operator("object.solid_draw", text='Solid', icon='AUTO')
         pie.operator("object.tex_draw", text='Textured', icon='TEXTURE')
-        pie.operator("object.wire_toggle", text='Wire Toggle', icon='SNAP_FACE')
+        pie.operator("object.wire_toggle", text='Wire Toggle', icon='HAND')
 
 _CLASSES = (
     VIEW3D_OT_toggle_view,
@@ -185,4 +185,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-    
